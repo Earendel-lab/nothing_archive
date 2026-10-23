@@ -67,8 +67,6 @@ function ColorModeToggle({
 
   return (
     <div className={clsx(styles.toggleContainer, className)}>
-      <div className={styles.slider} />
-      
       <button
         type="button"
         className={clsx(

@@ -261,7 +261,7 @@
   padding: 1.75rem 0;
 }
 
-/* Section category typography — establishes distinct visual hierarchy across content blocks */
+/* Section category typography: establishes distinct visual hierarchy across content blocks. */
 .sectionLabel {
   font-family: var(--f-headline);
   font-size: 2rem;
@@ -327,7 +327,7 @@
   animation-delay: 0.35s;
 }
 
-/* Grid rhythm & visual hierarchy — compacts secondary resource cards (Row 2) to break uniform template monotony */
+/* Grid rhythm and visual hierarchy: compacts secondary resource cards (Row 2) to break uniform template monotony. */
 .featureCol:nth-child(n+5) .featureCard {
   min-height: 155px;
   padding: 1.15rem;
@@ -399,7 +399,9 @@
 }
 
 [data-theme='dark'] .featureCard {
-  background-color: rgba(18, 18, 18, 0.75);
+  background-color: rgba(24, 24, 24, 0.85);
+  border-color: var(--nothing-border-strong);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 [data-theme='dark'] .featureCard:hover {
@@ -476,12 +478,16 @@
 
 .featureDesc {
   margin: 0;
-  font-size: 0.9rem;
-  opacity: 0.8;
-  line-height: 1.5;
+  font-size: 0.92rem;
+  opacity: 0.9;
+  line-height: 1.55;
   letter-spacing: -0.01em;
   position: relative;
   z-index: 1;
+}
+
+[data-theme='dark'] .featureDesc {
+  color: #D4D4D4;
 }
 
 /* --- Milestones Section --- */
@@ -1207,6 +1213,7 @@
 
   .heroSubtitle {
     margin: 0 auto 2rem auto;
+    max-width: 44ch;
   }
 
   .buttons {

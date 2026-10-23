@@ -415,7 +415,7 @@ export default function HeroGlyphLogo(): React.JSX.Element {
         <div className={styles.circleDisplay}>
           {mode === 'LOGO' ? (
             <img 
-              src={logoDarkUrl} 
+              src={logoDark256Url} 
               srcSet={`${logoDark256Url} 256w, ${logoDark384Url} 384w, ${logoDarkUrl} 512w`}
               sizes="(max-width: 576px) 146px, (max-width: 996px) 164px, 184px"
               className={styles.gifLogo}
@@ -423,7 +423,7 @@ export default function HeroGlyphLogo(): React.JSX.Element {
               width={184}
               height={184}
               fetchPriority="high"
-              decoding="async"
+              decoding="sync"
             />
           ) : (gameStarted || isGameOver) ? (
             /* 

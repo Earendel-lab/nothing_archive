@@ -41,7 +41,7 @@ assert(config.includes('imagesrcset'));
 assert(config.includes('imagesizes'));
 assert(config.includes('changelogLinks'));
 assert(config.includes('`${baseUrl}fonts/Geist-Variable.woff2`'));
-assert(config.includes('`${baseUrl}fonts/GeistMono-Variable.woff2`'));
+assert(!config.includes("href: `${baseUrl}fonts/GeistMono-Variable.woff2`"));
 assert(!config.includes("href: `${baseUrl}fonts/InterVariable.woff2`"));
 assert(config.includes("src: url('${baseUrl}fonts/Geist-Variable.woff2')"));
 assert(config.includes("src: url('${baseUrl}fonts/GeistMono-Variable.woff2')"));

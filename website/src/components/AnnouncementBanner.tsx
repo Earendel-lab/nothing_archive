@@ -39,21 +39,23 @@ export default function AnnouncementBanner(): React.JSX.Element | null {
   const pluginData = usePluginData('changelogs-plugin') as ChangelogsPluginData | undefined;
   const allChangelogs = pluginData?.changelogs || [];
 
-  const [releases, setReleases] = useState<ChangelogEntry[]>([]);
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [isPaused, setIsPaused] = useState<boolean>(false);
-  const [isDismissed, setIsDismissed] = useState<boolean>(true);
-  const [isDismissing, setIsDismissing] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!allChangelogs || allChangelogs.length === 0) return;
-
-    // Restrict announcements to builds released within the last 7 calendar days.
+  const recentReleases = React.useMemo(() => {
+    if (!allChangelogs || allChangelogs.length === 0) return [];
     const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    const recentReleases = allChangelogs.filter((entry) => {
+    return allChangelogs.filter((entry) => {
       const pubTime = new Date(entry.publishedAt).getTime();
       return pubTime >= sevenDaysAgo;
     });
+  }, [allChangelogs]);
+
+  const [releases, setReleases] = useState<ChangelogEntry[]>(recentReleases);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [isDismissed, setIsDismissed] = useState<boolean>(recentReleases.length === 0);
+  const [isDismissing, setIsDismissing] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (recentReleases.length === 0) return;
 
     const dismissedTags = parseDismissedTags(DISMISS_KEY);
     const nonDismissed = recentReleases.filter(
@@ -62,15 +64,11 @@ export default function AnnouncementBanner(): React.JSX.Element | null {
 
     if (nonDismissed.length > 0) {
       setReleases(nonDismissed);
-      // 3-second delay prevents layout shifts and lets above-the-fold content settle first.
-      const timer = setTimeout(() => {
-        setIsDismissed(false);
-      }, 3000);
-      return () => clearTimeout(timer);
+      setIsDismissed(false);
     } else {
       setIsDismissed(true);
     }
-  }, [allChangelogs]);
+  }, [recentReleases]);
 
   // 6.5-second rotation provides sufficient reading time per release before cycling.
   useEffect(() => {

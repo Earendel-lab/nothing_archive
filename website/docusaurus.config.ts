@@ -340,6 +340,7 @@ const config: Config = {
 
   future: {
     v4: true,
+    faster: true,
   },
 
   url: siteUrl,
@@ -691,16 +692,6 @@ const config: Config = {
       },
     },
     {
-      tagName: 'link',
-      attributes: {
-        rel: 'preload',
-        as: 'font',
-        type: 'font/woff2',
-        href: `${baseUrl}fonts/GeistMono-Variable.woff2`,
-        crossorigin: 'anonymous',
-      },
-    },
-    {
       tagName: 'style',
       attributes: {},
       innerHTML: `
@@ -792,17 +783,6 @@ const config: Config = {
         imagesrcset: `${baseUrl}img/brand/logo-dark-hero-256.webp 256w, ${baseUrl}img/brand/logo-dark-hero-384.webp 384w, ${baseUrl}img/brand/logo-dark-hero.webp 512w`,
         imagesizes: '(max-width: 576px) 146px, (max-width: 996px) 164px, 184px',
         fetchpriority: 'high',
-      },
-    },
-    // Preload critical headline font to eliminate FCP/LCP render delay.
-    {
-      tagName: 'link',
-      attributes: {
-        rel: 'preload',
-        href: `${baseUrl}fonts/NType82-Headline.woff2`,
-        as: 'font',
-        type: 'font/woff2',
-        crossorigin: 'anonymous',
       },
     },
   ],

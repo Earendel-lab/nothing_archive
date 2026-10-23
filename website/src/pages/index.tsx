@@ -367,7 +367,6 @@ function ContributorCard({
       target="_blank"
       rel="noopener noreferrer"
       className={cardClass}
-      aria-label={`View ${contrib.name || contrib.login}'s commits on GitHub`}
     >
       <div className={avatarContainerClass}>
         <img
@@ -475,7 +474,6 @@ function HomepageCommunity() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.leadCard}
-                aria-label={`View ${contrib.name || contrib.login}'s commits on GitHub`}
               >
                 <div className={styles.leadAvatarContainer}>
                   <img
@@ -718,6 +716,13 @@ export default function Home(): JSX.Element {
   useEffect(() => {
     const container = homepageRef.current;
     if (!container) return;
+
+    // Touch screens lack cursor hover; fixed glow coordinates avoid pointer listener overhead.
+    if (globalThis.window !== undefined && !window.matchMedia('(hover: hover)').matches) {
+      container.style.setProperty('--mouse-x', '75%');
+      container.style.setProperty('--mouse-y', '200px');
+      return;
+    }
 
     let lastClientX: number | null = null;
     let lastClientY: number | null = null;

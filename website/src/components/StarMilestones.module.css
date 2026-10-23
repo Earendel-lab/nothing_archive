@@ -1,8 +1,3 @@
-/**
- * StarMilestones.module.css — Repository milestone progress bar styles
- */
-
-/* Card Container */
 .milestoneContainer {
   margin-top: 0;
   padding: 1.75rem;
@@ -19,9 +14,9 @@
 }
 
 [data-theme='dark'] .milestoneContainer {
-  background-color: rgba(18, 18, 18, 0.75);
-  border-color: var(--nothing-border);
-  box-shadow: none !important;
+  background-color: rgba(24, 24, 24, 0.85);
+  border-color: var(--nothing-border-strong);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
 }
 
 
@@ -233,34 +228,30 @@
   box-shadow: 0 0 12px rgba(215, 25, 33, 0.95), 0 0 4px rgba(215, 25, 33, 0.6);
 }
 
-/* Active current segment breathing/pulse glow animation */
+/* Active current segment breathing/pulse glow animation (GPU composited) */
 .glyphSegmentCurrent .segmentBar {
+  box-shadow: 0 0 8px currentColor;
   animation: segmentPulse 1.8s ease-in-out infinite alternate;
 }
 
 @keyframes segmentPulse {
   0% {
     opacity: 0.75;
-    filter: brightness(0.9);
   }
   100% {
     opacity: 1;
-    filter: brightness(1.1);
-    box-shadow: 0 0 8px currentColor;
   }
 }
 
-/* Make white active segment glow white */
 .glyphSegmentWhite.glyphSegmentCurrent .segmentBar {
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.7), 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Make red active segment glow red */
 .glyphSegmentRed.glyphSegmentCurrent .segmentBar {
   box-shadow: 0 0 8px rgba(215, 25, 33, 0.7), 0 1px 3px rgba(215, 25, 33, 0.2);
 }
 
-/* Labels under segments — must mirror glyphTrack flex layout for alignment */
+/* Match glyphTrack flex layout for label alignment. */
 .labelsRow {
   display: flex;
   align-items: flex-start;

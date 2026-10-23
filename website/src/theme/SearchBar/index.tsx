@@ -321,6 +321,7 @@ function DocSearch({externalUrlRegex, ...props}: DocSearchV4Props) {
   });
 
   // Suppress Algolia forward-slash on showcase to yield '/' to the in-page search input.
+  // SAFETY: Custom AI toggle extension props satisfy standard DocSearch options structure.
   useDocSearchKeyboardEvents({
     isOpen,
     onOpen: openModal,

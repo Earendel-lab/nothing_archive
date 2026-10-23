@@ -1,5 +1,5 @@
 /**
- * SupportNudge — Bottom-right floating toast card.
+ * SupportNudge: Bottom-right floating toast card.
  *
  * Visual: glassmorphism card (backdrop-blur) with slide-in/slide-out
  * animations, a shrinking progress bar for auto-dismiss, and full
@@ -156,7 +156,7 @@
   background: transparent;
   border: 2px solid transparent;
   color: var(--ifm-font-color-base);
-  opacity: 0.45;
+  opacity: 0.72;
   font-size: 0.68rem;
   font-weight: 600;
   white-space: nowrap;

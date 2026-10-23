@@ -5,13 +5,12 @@ import styles from './CommitMatrix.module.css';
 import { getTimeLag } from '../utils/time';
 import { useGitHubCommits, useGitHubRepoStats } from '../utils/github-cache';
 import type { Commit } from '../utils/github-cache';
-
 interface HitsState {
   hits: number;
 }
 
-const HITS_CACHE_KEY = 'nothing_archive_hits_v1';
-const HITS_CACHE_TIME_KEY = 'nothing_archive_hits_time_v1';
+const HITS_CACHE_KEY = 'nothing_archive_hits_v2';
+const HITS_CACHE_TIME_KEY = 'nothing_archive_hits_time_v2';
 // 15-minute hit count cache prevents excessive calls to the external hitscounter service.
 const HITS_CACHE_TIMEOUT = 15 * 60 * 1000;
 
@@ -20,8 +19,26 @@ export default function CommitMatrix(): React.JSX.Element {
   const { stats: repoStats, loading: statsGhLoading } = useGitHubRepoStats();
 
   // hitscounter.dev is an external visitor tracker, not a GitHub API.
-  const [hitsData, setHitsData] = useState<HitsState>({ hits: 0 });
-  const [hitsLoading, setHitsLoading] = useState(true);
+  const [hitsData, setHitsData] = useState<HitsState>(() => {
+    try {
+      const cachedData = localStorage.getItem(HITS_CACHE_KEY);
+      if (cachedData) {
+        const parsed = JSON.parse(cachedData);
+        if (parsed?.hits > 0) return parsed;
+      }
+    } catch {}
+    return { hits: 0 };
+  });
+  const [hitsLoading, setHitsLoading] = useState(() => {
+    try {
+      const cachedData = localStorage.getItem(HITS_CACHE_KEY);
+      if (cachedData) {
+        const parsed = JSON.parse(cachedData);
+        if (parsed?.hits > 0) return false;
+      }
+    } catch {}
+    return true;
+  });
 
   const filteredCommits = useMemo(() => {
     // 7 rows fill the telemetry console panel without vertical scrolling.
@@ -38,43 +55,56 @@ export default function CommitMatrix(): React.JSX.Element {
   }, [commits]);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadHits() {
       try {
         const cachedData = localStorage.getItem(HITS_CACHE_KEY);
         const cachedTime = localStorage.getItem(HITS_CACHE_TIME_KEY);
         const now = Date.now();
-
         if (cachedData && cachedTime && now - parseInt(cachedTime, 10) < HITS_CACHE_TIMEOUT) {
-          setHitsData(JSON.parse(cachedData));
-          setHitsLoading(false);
-          return;
+          const parsed = JSON.parse(cachedData);
+          if (parsed?.hits > 0) {
+            if (!cancelled) {
+              setHitsData(parsed);
+              setHitsLoading(false);
+            }
+            return;
+          }
         }
 
         const hitsRes = await fetch(
           'https://hitscounter.dev/api/hit?output=json&url=https%3A%2F%2Fgithub.com%2Fspike0en%2Fnothing_archive'
         );
 
-        let hits = 0;
         if (hitsRes.ok) {
           const data = await hitsRes.json();
-          hits = data.total_hits || 0;
-        } else {
-          const old = cachedData ? JSON.parse(cachedData) : null;
-          hits = old ? old.hits : 0;
+          const hits = data.total_hits || 0;
+          if (hits > 0) {
+            const newHits = { hits };
+            try {
+              localStorage.setItem(HITS_CACHE_KEY, JSON.stringify(newHits));
+              localStorage.setItem(HITS_CACHE_TIME_KEY, now.toString());
+            } catch {}
+            if (!cancelled) {
+              setHitsData(newHits);
+            }
+          }
         }
-
-        const newHits = { hits };
-        localStorage.setItem(HITS_CACHE_KEY, JSON.stringify(newHits));
-        localStorage.setItem(HITS_CACHE_TIME_KEY, now.toString());
-        setHitsData(newHits);
-        setHitsLoading(false);
-      } catch (err) {
-        console.warn('loadHits failed', err);
-        setHitsLoading(false);
+      } catch {
+        // Retain existing hit count if external service is unreachable.
+      } finally {
+        if (!cancelled) {
+          setHitsLoading(false);
+        }
       }
     }
 
-    loadHits();
+    void loadHits();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const latestCommit = commits[0] || { sha: '------', author: 'N/A', coAuthors: [], date: '', message: 'Waiting for connection...' };
@@ -90,7 +120,7 @@ export default function CommitMatrix(): React.JSX.Element {
     },
     {
       label: 'VIEWS',
-      value: hitsLoading ? '—' : hitsData.hits.toLocaleString(),
+      value: hitsLoading ? '—' : hitsData.hits > 0 ? hitsData.hits.toLocaleString() : '—',
     },
   ];
 
@@ -103,7 +133,7 @@ export default function CommitMatrix(): React.JSX.Element {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       if (!ctx) return 110;
-      ctx.font = '500 0.72rem Geist, "Inter var", Inter, system-ui, sans-serif';
+      ctx.font = '500 0.72rem Geist, system-ui, sans-serif';
       let maxW = 40;
       filteredCommits.forEach((commit) => {
         if (commit.coAuthors.length === 0) {

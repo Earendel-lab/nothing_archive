@@ -163,13 +163,13 @@ div[class*="tableWrapper"] table td,
   --ifm-color-success-lighter: #1cd094;
   --ifm-color-success-lightest: #34d39f;
 
-  --ifm-font-family-base: 'Geist', 'Inter var', 'Inter', system-ui, -apple-system, sans-serif;
+  --ifm-font-family-base: 'Geist', system-ui, -apple-system, sans-serif;
   --ifm-font-family-monospace: 'Geist Mono', GeistMono, 'Geist-Mono', 'JetBrains Mono', 'Fira Code', 'Fira Mono', 'SF Mono', Monaco, Consolas, 'Liberation Mono', monospace;
   
   /* Brand Typography Tokens */
   --f-ndot: 'NDot55', 'Geist Mono', GeistMono, monospace;
   --f-headline: 'NType82Headline', 'Geist', sans-serif;
-  --f-regular: 'NType82', 'Geist', 'Inter var', sans-serif;
+  --f-regular: 'NType82', 'Geist', sans-serif;
   --f-mono: 'NType82Mono', 'Geist Mono', GeistMono, 'JetBrains Mono', monospace;
   --f-lettera: 'LetteraMonoLL', 'Geist Mono', GeistMono, monospace;
 
@@ -257,6 +257,7 @@ div[class*="tableWrapper"] table td,
 
   --ifm-background-color: #000000;
   --ifm-navbar-background-color: #000000;
+  --ifm-navbar-link-hover-color: var(--ifm-color-primary-lighter);
   --ifm-footer-background-color: #000000;
   --ifm-card-background-color: #1A1A1A;
 
@@ -350,7 +351,11 @@ div[class*="tableWrapper"] table td,
   color: var(--ifm-color-primary) !important;
 }
 
-/* Active primary navigation indicator bar — centered horizontal pill anchored to active route */
+[data-theme='dark'] .navbar__link--active {
+  color: var(--ifm-color-primary-lighter) !important;
+}
+
+/* Active primary navigation indicator bar: centered horizontal pill anchored to active route. */
 .navbar__link--active::after {
   content: '';
   position: absolute;

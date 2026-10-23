@@ -42,7 +42,6 @@ export default function StarMilestones(): React.JSX.Element {
     return MILESTONES.map((milestone, idx) => {
       if (stars >= milestone) return 100;
       
-      // Before the first milestone
       if (idx === 0) {
         return Math.max(0, Math.min(100, (stars / milestone) * 100));
       }
@@ -50,7 +49,6 @@ export default function StarMilestones(): React.JSX.Element {
       const prevMilestone = MILESTONES[idx - 1];
       if (stars <= prevMilestone) return 0;
       
-      // Partial progress inside this segment
       return Math.max(0, Math.min(100, ((stars - prevMilestone) / (milestone - prevMilestone)) * 100));
     });
   }, [stars]);
@@ -126,7 +124,7 @@ export default function StarMilestones(): React.JSX.Element {
           target="_blank"
           rel="noopener noreferrer"
           className={styles.starCta}
-          aria-label="Star Nothing Archive on GitHub"
+          aria-label="Star on GitHub"
         >
           <FaStar size={11} className={styles.starIcon} />
           Star on GitHub

@@ -72,29 +72,21 @@
 
 
 
-/* Concentric rings ripple animation */
+/* Concentric rings ripple animation (GPU composited) */
 @keyframes rippleWave {
   0% {
     transform: scale(1);
     opacity: 0;
-    border-color: rgba(215, 25, 33, 0.2);
-    filter: drop-shadow(0 0 3px rgba(215, 25, 33, 0.1));
   }
   20% {
     opacity: 0.95;
-    border-color: rgba(215, 25, 33, 0.85);
-    filter: drop-shadow(0 0 8px rgba(215, 25, 33, 0.5));
   }
   60% {
     opacity: 0.5;
-    border-color: rgba(215, 25, 33, 0.45);
-    filter: drop-shadow(0 0 10px rgba(215, 25, 33, 0.3));
   }
   100% {
     transform: scale(1.30);
     opacity: 0;
-    border-color: rgba(215, 25, 33, 0);
-    filter: drop-shadow(0 0 12px rgba(215, 25, 33, 0));
   }
 }
 
@@ -854,8 +846,8 @@
     width: 235px;
   }
   .logoChassisLogo {
-    width: 160px;
-    height: 160px;
+    width: 172px;
+    height: 172px;
   }
   .logoChassisGlyphs {
     width: 160px;
@@ -872,8 +864,8 @@
     margin-top: 12px;
   }
   .logoChassisLogo .bezelRing {
-    width: 160px;
-    height: 160px;
+    width: 172px;
+    height: 172px;
     margin-top: 0;
   }
   .circleDisplay {
@@ -881,8 +873,8 @@
     height: 104px;
   }
   .logoChassisLogo .circleDisplay {
-    width: 148px;
-    height: 148px;
+    width: 162px;
+    height: 162px;
   }
   .matrixGrid {
     grid-template-columns: repeat(15, 5px);
@@ -936,8 +928,8 @@
     height: 104px;
   }
   .logoChassisLogo .gifLogo {
-    width: 146px;
-    height: 146px;
+    width: 160px;
+    height: 160px;
   }
 }
 

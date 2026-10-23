@@ -402,34 +402,79 @@ function useGitHubData<T>(config: {
         }
       }
 
-      // 4. Background refresh via GitHub API.
-      try {
-        const freshData = await deduplicatedFetch(config.cacheKey, config.fetcher);
-        if (!cancelled && config.isValid(freshData)) {
-          setData(freshData);
-          setStatus('LIVE');
-          setError(null);
-          setLoading(false);
-          memoryCache.set(config.cacheKey, { data: freshData, timestamp: Date.now() });
-          if (globalThis.window !== undefined) {
-            writeLocalStorage(config.lsKey, config.lsTimeKey, freshData);
+      // Defer background refresh until main thread is idle to protect interaction latency.
+      const runBackgroundFetch = async () => {
+        if (globalThis.window !== undefined) {
+          try {
+            if (['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+              const hasData = config.isValid(data) || config.isValid(config.staticFallback);
+              if (hasData) {
+                setLoading(false);
+                return;
+              }
+            }
+            if (globalThis.sessionStorage !== undefined) {
+              const rl = sessionStorage.getItem('na_gh_rate_limited');
+              if (rl && Date.now() - Number(rl) < 3600000) {
+                setLoading(false);
+                return;
+              }
+            }
+          } catch {}
+        }
+
+        try {
+          const freshData = await deduplicatedFetch(config.cacheKey, config.fetcher);
+          if (!cancelled && config.isValid(freshData)) {
+            setData(freshData);
+            setStatus('LIVE');
+            setError(null);
+            setLoading(false);
+            memoryCache.set(config.cacheKey, { data: freshData, timestamp: Date.now() });
+            if (globalThis.window !== undefined) {
+              writeLocalStorage(config.lsKey, config.lsTimeKey, freshData);
+            }
+          }
+        } catch (err: any) {
+          if (!cancelled) {
+            setLoading(false);
+            if (err.message === 'RATE_LIMITED' && globalThis.sessionStorage !== undefined) {
+              try {
+                sessionStorage.setItem('na_gh_rate_limited', Date.now().toString());
+              } catch {}
+            }
+            const hasData = config.isValid(data);
+            if (!hasData) {
+              setError(err.message === 'RATE_LIMITED' ? 'RATE_LIMITED' : 'FAILED');
+              setStatus('OFFLINE');
+            }
           }
         }
-      } catch (err: any) {
-        if (!cancelled) {
-          setLoading(false);
-          // Surface error only if no cached or static data is available.
-          const hasData = config.isValid(data);
-          if (!hasData) {
-            setError(err.message === 'RATE_LIMITED' ? 'RATE_LIMITED' : 'FAILED');
-            setStatus('OFFLINE');
-          }
+      };
+
+      timeoutHandle = setTimeout(() => {
+        if (globalThis.window !== undefined && 'requestIdleCallback' in window) {
+          idleHandle = window.requestIdleCallback(() => {
+            if (!cancelled) void runBackgroundFetch();
+          });
+        } else if (!cancelled) {
+          void runBackgroundFetch();
         }
-      }
+      }, 4000);
     }
 
+    let idleHandle: number | null = null;
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      if (idleHandle !== null && globalThis.window !== undefined && 'cancelIdleCallback' in window) {
+        window.cancelIdleCallback(idleHandle);
+      }
+      if (timeoutHandle !== null) {
+        clearTimeout(timeoutHandle);
+      }
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { data, status, error, loading };
